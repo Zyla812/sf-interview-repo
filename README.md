@@ -65,15 +65,3 @@ Implement listing search and category filters end to end. Resolve related issues
 Persist and display bid history so users can see all prior bids for a listing, with the highest bid clearly highlighted.
 
 ---
-
-## Running Tests
-
-```bash
-# Apex unit tests
-sf apex run test --synchronous --code-coverage --target-org FarmAuction
-
-# Jest tests
-npm test
-```
-
-> **Note**: `BidControllerTest.testPlaceBidRejectsEqualBidAfterFix` will fail until Task 0 is complete. This is by design.
