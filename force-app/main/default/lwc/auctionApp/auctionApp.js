@@ -24,7 +24,10 @@ export default class AuctionApp extends LightningElement {
 
     loadListings() {
         this.isLoading = true;
-        getListings()
+        getListings({
+            searchTerm: this.searchTerm,
+            category: this.selectedCategory
+        })
             .then(result => {
                 this.listings = result.listings;
                 this.isLoading = false;

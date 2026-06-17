@@ -1,0 +1,56 @@
+<template>
+    <lightning-card title="Bid History" icon-name="utility:moneybag">
+
+        <template if:true={bids.length}>
+            <div class="slds-p-around_small">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th>Highest</th>
+                            <th>Bidder</th>
+                            <th>Amount</th>
+                            <th>Bid Time</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={bids} for:item="bid">
+                            <tr key={bid.bidTime}>
+                                <td>
+                                    <template if:true={bid.isHighest}>
+                                        <lightning-badge
+                                            label="🏆 Highest">
+                                        </lightning-badge>
+                                    </template>
+                                </td>
+
+                                <td>{bid.bidderName}</td>
+
+                                <td>
+                                    <lightning-formatted-number
+                                        value={bid.amount}
+                                        format-style="currency"
+                                        currency-code="USD">
+                                    </lightning-formatted-number>
+                                </td>
+
+                                <td>
+                                    <lightning-formatted-date-time
+                                        value={bid.bidTime}>
+                                    </lightning-formatted-date-time>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+
+        <template if:false={bids.length}>
+            <div class="slds-p-around_medium">
+                No bids yet.
+            </div>
+        </template>
+
+    </lightning-card>
+</template>

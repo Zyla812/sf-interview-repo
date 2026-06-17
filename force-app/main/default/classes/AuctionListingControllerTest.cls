@@ -35,10 +35,78 @@ private class AuctionListingControllerTest {
     @IsTest
     static void testGetListingsReturnsAllListings() {
         Test.startTest();
-        AuctionListingController.ListingsResult result = AuctionListingController.getListings();
+        AuctionListingController.ListingsResult result = AuctionListingController.getListings(null, null);
         Test.stopTest();
 
         System.assertEquals(3, result.listings.size(), 'Should return all listings, including closed');
+    }
+
+    @IsTest
+    static void testGetListingsSearchFilter() {
+
+        Test.startTest();
+        AuctionListingController.ListingsResult result =
+            AuctionListingController.getListings(
+                'John Deere',
+                null
+            );
+        Test.stopTest();
+
+        System.assertEquals(1, result.listings.size());
+        System.assertEquals(
+            'John Deere 8R Tractor',
+            result.listings[0].title
+        );
+    }
+
+    @IsTest
+    static void testGetListingsCategoryFilter() {
+
+        Test.startTest();
+        AuctionListingController.ListingsResult result =
+            AuctionListingController.getListings(
+                null,
+                'Combine'
+            );
+        Test.stopTest();
+
+        System.assertEquals(1, result.listings.size());
+        System.assertEquals(
+            'Combine',
+            result.listings[0].category
+        );
+    }
+
+    @IsTest
+    static void testGetListingsSearchAndCategoryFilter() {
+
+        Test.startTest();
+        AuctionListingController.ListingsResult result =
+            AuctionListingController.getListings(
+                'John',
+                'Tractor'
+            );
+        Test.stopTest();
+
+        System.assertEquals(1, result.listings.size());
+        System.assertEquals(
+            'John Deere 8R Tractor',
+            result.listings[0].title
+        );
+    }
+
+    @IsTest
+    static void testGetListingsNoMatch() {
+
+        Test.startTest();
+        AuctionListingController.ListingsResult result =
+            AuctionListingController.getListings(
+                'NonExisting',
+                null
+            );
+        Test.stopTest();
+
+        System.assertEquals(0, result.listings.size());
     }
 
     @IsTest

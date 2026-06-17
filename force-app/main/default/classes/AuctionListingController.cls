@@ -18,13 +18,38 @@ public with sharing class AuctionListingController {
     }
 
     @AuraEnabled
-    public static ListingsResult getListings() {
-        List<Auction_Listing__c> listings = Database.query(
-            'SELECT Id, Title__c, Description__c, Category__c, ' +
-            'Starting_Price__c, Current_Bid__c, Current_Bidder__c, ' +
-            'Status__c, Ends_At__c, Image_URL__c ' +
-            'FROM Auction_Listing__c ORDER BY Ends_At__c ASC'
-        );
+    public static ListingsResult getListings(String searchTerm,String category) {
+        String query =
+        'SELECT Id, Title__c, Description__c, Category__c, ' +
+        'Starting_Price__c, Current_Bid__c, Current_Bidder__c, ' +
+        'Status__c, Ends_At__c, Image_URL__c ' +
+        'FROM Auction_Listing__c';
+
+        List<String> filters = new List<String>();
+
+        if (!String.isBlank(searchTerm)) {
+            filters.add(
+                'Title__c LIKE \'%' +
+                String.escapeSingleQuotes(searchTerm) +
+                '%\''
+            );
+        }
+
+        if (!String.isBlank(category)) {
+            filters.add(
+                'Category__c = \'' +
+                String.escapeSingleQuotes(category) +
+                '\''
+            );
+        }
+
+        if (!filters.isEmpty()) {
+            query += ' WHERE ' + String.join(filters, ' AND ');
+        }
+
+        query += ' ORDER BY Ends_At__c ASC';
+
+        List<Auction_Listing__c> listings = Database.query(query);
 
         ListingsResult result = new ListingsResult();
         result.listings = new List<ListingWrapper>();

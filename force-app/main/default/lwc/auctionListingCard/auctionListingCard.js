@@ -50,4 +50,8 @@ export default class AuctionListingCard extends LightningElement {
             ? 'slds-badge slds-badge_success'
             : 'slds-badge';
     }
+
+    handleBidSuccess() {
+        this.loadListing();
+    }
 }

@@ -41,6 +41,9 @@
                         starting-price={listing.startingPrice}
                         onbidsuccess={handleBidSuccess}>
                     </c-bid-form>
+                    <c-bid-history
+                        listing-id={listing.id}>
+                    </c-bid-history>
                 </template>
             </div>
         </lightning-card>

@@ -5,14 +5,28 @@ import { subscribe, unsubscribe } from 'lightning/empApi';
 const FALLBACK_IMAGE = 'https://placehold.co/800x400/e8e8e8/666?text=No+Image';
 
 export default class AuctionListingDetail extends LightningElement {
-    @api listingId;
+  
     @track listing = null;
     @track isLoading = false;
 
     _subscription = null;
 
+    _listingId;
+
+    @api
+    set listingId(value) {
+        this._listingId = value;
+
+        if (value) {
+            this.loadListing();
+        }
+    }
+
+    get listingId() {
+        return this._listingId;
+    }
+
     connectedCallback() {
-        this.loadListing();
         subscribe('/event/Bid_Placed__e', -1, (event) => {
             if (event.data.payload.Listing_Id__c === this.listingId) {
                 this.loadListing();
@@ -43,6 +57,12 @@ export default class AuctionListingDetail extends LightningElement {
 
     handleBidSuccess() {
         this.loadListing();
+        const historyCmp = this.template.querySelector('c-bid-history');
+
+        if (historyCmp) {
+            historyCmp.refreshHistory();
+        }
+
         this.dispatchEvent(new CustomEvent('bidsuccess'));
     }
 

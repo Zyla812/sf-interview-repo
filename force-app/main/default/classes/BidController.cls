@@ -1,10 +1,55 @@
 public with sharing class BidController {
 
+
+
     public class BidWrapper {
         @AuraEnabled public String id { get; set; }
         @AuraEnabled public String bidderName { get; set; }
         @AuraEnabled public Decimal amount { get; set; }
         @AuraEnabled public String listingId { get; set; }
+    }
+
+
+    public class BidHistoryWrapper {
+        @AuraEnabled public String bidderName;
+        @AuraEnabled public Decimal amount;
+        @AuraEnabled public Datetime bidTime;
+        @AuraEnabled public Boolean isHighest;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<BidHistoryWrapper> getBidHistory(
+        String listingId
+    ) {
+        List<Bid__c> bids = [
+            SELECT Id,
+                Bidder_Name__c,
+                Amount__c,
+                CreatedDate
+            FROM Bid__c
+            WHERE Auction_Listing__c = :listingId
+            ORDER BY Amount__c DESC
+        ];
+
+        List<BidHistoryWrapper> results =
+            new List<BidHistoryWrapper>();
+
+        Boolean first = true;
+
+        for (Bid__c bid : bids) {
+            BidHistoryWrapper wrapper =
+                new BidHistoryWrapper();
+
+            wrapper.bidderName = bid.Bidder_Name__c;
+            wrapper.amount = bid.Amount__c;
+            wrapper.bidTime = bid.CreatedDate;
+            wrapper.isHighest = first;
+
+            results.add(wrapper);
+            first = false;
+        }
+
+        return results;
     }
 
     @AuraEnabled
@@ -35,11 +80,22 @@ public with sharing class BidController {
                 ? listing.Current_Bid__c
                 : listing.Starting_Price__c;
 
-            if (amount >= threshold) {
+            if (amount <= threshold) {
                 throw new AuraHandledException(
                     'Bid must be greater than the current bid of ' + threshold
                 );
             }
+
+            // Create bid history record
+            Bid__c bid = new Bid__c(
+                Auction_Listing__c = listing.Id,
+                Bidder_Name__c = bidderName,
+                Amount__c = amount,
+                Bid_Time__c = System.now()
+            );
+
+            insert bid;
+
 
             listing.Current_Bid__c = amount;
             listing.Current_Bidder__c = bidderName;
